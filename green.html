@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -29,68 +30,57 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-      <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    
-      <link rel="stylesheet" href="webpage.css"></link>
-  </head>
 
-  <body>
+    <link rel="stylesheet" href="webpage.css"></link>
+</head>
+
+<body>
 
     <div class="site-wrapper">
 
-      <div class="site-wrapper-inner">
+        <div class="site-wrapper-inner">
 
-        <div class="cover-container">
+            <div class="cover-container">
 
-          <div class="masthead clearfix">
-            <div class="inner">
-              <h3 class="masthead-brand">Cover</h3>
-              <nav>
-                <ul class="nav masthead-nav">
-                  <li class="active"><a href="index.html">Home</a></li>
-                  <li><a href="green.html">Green Roofs</a></li>
-                  <li><a href="farms.html">Urban Farms</a></li>
-                  <li><a href="about.html">About This Project</a></li>
-                </ul>
-              </nav>
-            </div>
-          </div>
+                <div class="masthead clearfix">
+                    <div class="inner">
+                        <h3 class="masthead-brand">Cover</h3>
+                        <nav>
+                            <ul class="nav masthead-nav">
+                                <li class="active"><a href="index.html">Home</a></li>
+                                <li><a href="green.html">Green Roofs</a></li>
+                                <li><a href="farms.html">Urban Farms</a></li>
+                                <li><a href="about.html">About This Project</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
 
- <div class="jumbotron">
-        <div class="container text-center">
-
-            <h1>Green Roofs in Chicago</h1>
-            <p>Pick a street name, and we'll show you if there's any green roofs on that street.</p>
-            <div class="form-group">
-                <input class="form-control" id="focusedInput" type="text" value="GREEN">
-            </div>
-            <div class="btn-group-vertical" id="search">
-                <a href="#" class="btn b-tn-default">Search</a>
-            </div>
-        </div>
-    </div>
+                <div id="map"></div>
+                <div id="data"></div>
 
 
-
-    <div id="map"></div>
 
 </body>
 
 <script>
-    $("#focusedInput").click(function() {
-        $(".form-control").val("");
-    });
-</script>
+    let data = window.location.search.substring(1);
+    let params = new URLSearchParams(data);
+    document.getElementById("data").innerHTML = params.get("Data");
+    var formData = document.getElementById("data").innerHTML;
+    console.log(formData)
 
-<script>
+
     // base URL with filter on inspection_type;  zip will be appended
     var loopHTML, loopStatus;
     // This example displays a marker at the center of Australia.
     // When the user clicks the marker, an info window opens.
     var map;
     var arrmarkers = [];
+
     function initMap() {
         var centerMap = {
             lat: 41.8781,
@@ -101,56 +91,54 @@
             center: centerMap
         });
     }
-    
-    document.getElementById("street_name").innerHTML = window.location.search;
-    
-    $("#search").click(function() {
-        var jsonURL = "https://data.cityofchicago.org/resource/u23m-pa73.json?street_name=";
-        clearMarkers();
-        $("#focusedInput").html($("#focusedInput").val());
-        jsonURL = jsonURL + $("#focusedInput").val();
-        $.getJSON(jsonURL)
-            .done(function(result) {
-                // create a panel for each one
-                $.each(result, function(i, v) {
-                    console.log(v);
-                    if (v.location) {
-                        var marker = new google.maps.Marker({
-                            position: {
-                                lat: parseFloat(v.location.latitude),
-                                lng: parseFloat(v.location.longitude)
-                            },
-                            map: map,
-                            title: v.full_address
-                        });
-                        arrmarkers.push(marker);
-                        marker.addListener('click', function() {
-                            infowindow.open(map, marker);
-                        });
-                    }
-                    var contentString = '<div id="content">' +
-                        '<div id="siteNotice">' +
-                        '</div>' +
-                        '<h1 id="firstHeading" class="firstHeading">' +
-                        v.total_roof_sqft + " " + "Acres" +
-                        '</h1>' +
-                        '<div id="bodyContent">' +
-                        '<ul>' +
-                        '<li> Green Roof Address ' + v.full_address + '</li>' +
-                        '<li> Total Square Footage on Roof' + v.total_roof_sqft + '</li>' +
-                        '<li> Vegetated Square Footage' + v.vegetated_sqft + '</li>' +
-                        '</ul>' +
-                        '</div>' +
-                        '</div>';
-                    var infowindow = new google.maps.InfoWindow({
-                        content: contentString
+
+
+    var jsonURL = "https://data.cityofchicago.org/resource/u23m-pa73.json?street_name=";
+    clearMarkers();
+    jsonURL = jsonURL + formData;
+    console.log(jsonURL)
+    $.getJSON(jsonURL)
+        .done(function(result) {
+            // create a panel for each one
+            $.each(result, function(i, v) {
+                console.log(v);
+                if (v.location) {
+                    var marker = new google.maps.Marker({
+                        position: {
+                            lat: parseFloat(v.location.latitude),
+                            lng: parseFloat(v.location.longitude)
+                        },
+                        map: map,
+                        title: v.full_address
                     });
+                    arrmarkers.push(marker);
+                    marker.addListener('click', function() {
+                        infowindow.open(map, marker);
+                    });
+                }
+                var contentString = '<div id="content">' +
+                    '<div id="siteNotice">' +
+                    '</div>' +
+                    '<h1 id="firstHeading" class="firstHeading">' +
+                    v.total_roof_sqft + " " + "Acres" +
+                    '</h1>' +
+                    '<div id="bodyContent">' +
+                    '<ul>' +
+                    '<li> Green Roof Address ' + v.full_address + '</li>' +
+                    '<li> Total Square Footage on Roof' + v.total_roof_sqft + '</li>' +
+                    '<li> Vegetated Square Footage' + v.vegetated_sqft + '</li>' +
+                    '</ul>' +
+                    '</div>' +
+                    '</div>';
+                var infowindow = new google.maps.InfoWindow({
+                    content: contentString
                 });
-            })
-            .fail(function() {
-                console.log('failure')
             });
-    });
+        })
+        .fail(function() {
+            console.log('failure')
+        });
+
     function clearMarkers() {
         $.each(arrmarkers, function(i, v) {
             v.setMap(null);
@@ -159,5 +147,6 @@
 </script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBJX1xeZvRJ-D4A4LPOmP0mb8vpGsvRjqU&callback=initMap">
 </script>
-  </body>
+</body>
+
 </html>
